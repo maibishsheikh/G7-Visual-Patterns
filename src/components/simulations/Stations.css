@@ -1,15 +1,16 @@
 /* src/components/simulations/Stations.css */
-/* Responsive, accessible styles for MosaicQuest Simulation Stations */
+/* Complete station styling for MosaicQuest Simulate Phase */
 
+/* ─── Main Station Container ───────────────────────────────────────────── */
 .station-wrap {
   flex: 1;
   min-height: 0;
   max-height: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  padding: clamp(6px, 1vh, 12px) clamp(8px, 1.2vw, 16px);
-  gap: clamp(6px, 1vh, 10px);
+  justify-content: flex-start;
+  padding: clamp(6px, 1vh, 10px) clamp(8px, 1.2vw, 16px);
+  gap: clamp(6px, 0.8vh, 10px);
   position: relative;
   width: 100%;
   box-sizing: border-box;
@@ -17,126 +18,206 @@
   overflow-x: hidden;
 }
 
-/* ─── Station Header ─── */
+/* ─── Station Header & Badges ───────────────────────────────────────────── */
 .station-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 8px;
   flex-shrink: 0;
   width: 100%;
+  box-sizing: border-box;
 }
 
 .station-title {
-  color: var(--gold-light);
+  color: #fcd34d;
   font-family: var(--font-display);
   font-weight: 900;
-  font-size: clamp(1.1rem, 1.4vw, 1.4rem);
+  font-size: clamp(1rem, 1.3vw, 1.3rem);
+  line-height: 1.2;
   margin: 0;
   display: flex;
   align-items: center;
   gap: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
 }
 
 .station-badge {
   background: rgba(245, 158, 11, 0.2);
-  border: 1.5px solid var(--gold);
-  border-radius: var(--radius-pill);
-  padding: 4px 12px;
+  border: 1.5px solid #f59e0b;
+  border-radius: var(--radius-pill, 9999px);
+  padding: 3px 12px;
   font-family: var(--font-display);
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 800;
-  color: var(--gold-light);
+  color: #fcd34d;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
-/* ─── 2-Column Responsive Layout ─── */
+/* ─── Round Badge ─── */
+.station-round-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(99, 102, 241, 0.2);
+  border: 1.5px solid rgba(99, 102, 241, 0.5);
+  border-radius: var(--radius-pill, 9999px);
+  padding: 3px 12px;
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #a5b4fc;
+  flex-shrink: 0;
+}
+
+/* ─── Score Strip ─── */
+.station-score-strip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 6px 14px;
+  background: rgba(12, 10, 32, 0.7);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+}
+.score-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.85rem;
+  color: #cbd5e1;
+}
+.score-item .score-val {
+  color: #fcd34d;
+}
+
+/* ─── 2-Column Responsive Grid ──────────────────────────────────────────── */
 .station-grid-2col {
   display: grid;
   grid-template-columns: 1.1fr 0.9fr;
-  gap: clamp(10px, 1.4vw, 16px);
+  gap: clamp(8px, 1.2vw, 14px);
   align-items: stretch;
   flex: 1;
+  min-height: 0;
   width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 @media (max-width: 768px) {
   .station-grid-2col {
     grid-template-columns: 1fr;
+    overflow-y: auto;
   }
 }
 
+/* ─── Glass Card Panel ──────────────────────────────────────────────────── */
 .station-card-panel {
   background: rgba(22, 27, 56, 0.72);
   border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-md, 14px);
   padding: clamp(10px, 1.5vw, 16px);
   display: flex;
   flex-direction: column;
   gap: 10px;
   backdrop-filter: blur(12px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;
 }
 
 .panel-title {
   font-family: var(--font-display);
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 800;
-  color: var(--gold);
+  color: #f59e0b;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   display: flex;
   align-items: center;
   gap: 6px;
+  flex-shrink: 0;
 }
 
-/* ─── Interactive Tile Grid Board ─── */
-.mosaic-board-grid {
+/* ─── 3×3 Tile Grid ─────────────────────────────────────────────────────── */
+.tile-grid-3x3 {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 8px;
   padding: 12px;
-  background: rgba(10, 14, 30, 0.65);
-  border: 1.5px solid rgba(255, 255, 255, 0.12);
-  border-radius: var(--radius-md);
+  background: rgba(10, 14, 30, 0.7);
+  border-radius: 14px;
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
   justify-items: center;
-  align-items: center;
 }
 
-.mosaic-tile-slot {
-  width: 64px;
-  height: 64px;
-  border-radius: 10px;
+.tile-cell {
+  width: clamp(60px, 7vw, 80px);
+  height: clamp(60px, 7vw, 80px);
+  border-radius: 12px;
   background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 2px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   transition: all 0.25s ease;
-  position: relative;
+  cursor: default;
+}
+.tile-cell:hover {
+  border-color: rgba(245, 158, 11, 0.4);
+  background: rgba(245, 158, 11, 0.08);
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.2);
+}
+.tile-cell-label {
+  font-family: var(--font-display);
+  font-size: 0.6rem;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
 }
 
-.mosaic-tile-slot.active {
-  border-color: var(--gold);
-  background: rgba(245, 158, 11, 0.1);
-  box-shadow: 0 0 12px rgba(245, 158, 11, 0.3);
+/* ─── Orientation Status Row ─── */
+.orientation-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 12px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+}
+.orientation-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--color-text-muted, #94a3b8);
+}
+.orientation-value {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #fcd34d;
 }
 
-.mosaic-tile-slot.clickable {
-  cursor: pointer;
-}
-.mosaic-tile-slot.clickable:hover {
-  transform: scale(1.05);
-  border-color: var(--gold-light);
-}
-
-.mosaic-tile-slot.flawed {
-  border-color: var(--red);
-  background: rgba(244, 63, 94, 0.15);
-  animation: shake 0.6s infinite ease-in-out;
+/* ─── Transform Controls Panel ──────────────────────────────────────────── */
+.transform-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-/* ─── Controls & Steppers ─── */
 .controls-group {
   display: flex;
   flex-direction: column;
@@ -156,11 +237,49 @@
 
 .control-label {
   font-family: var(--font-body);
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-weight: 700;
-  color: var(--color-text-muted);
+  color: var(--color-text-muted, #94a3b8);
+  white-space: nowrap;
 }
 
+/* ─── Toggle Button Group ─── */
+.control-toggle-group {
+  display: flex;
+  gap: 5px;
+}
+.control-toggle-btn {
+  padding: 4px 10px;
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  font-weight: 800;
+  border-radius: 8px;
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+.control-toggle-btn:hover {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: rgba(245, 158, 11, 0.5);
+  color: #fcd34d;
+}
+.control-toggle-btn.active {
+  background: linear-gradient(135deg, #ffc107, #ff9800);
+  color: #1a1a2e;
+  border-color: #fbbf24;
+  box-shadow: 0 2px 10px rgba(245, 158, 11, 0.35);
+}
+.control-toggle-btn.active-green {
+  background: linear-gradient(135deg, #00e676, #00c853);
+  color: #0a2e0a;
+  border-color: #4ade80;
+  box-shadow: 0 2px 10px rgba(16, 185, 129, 0.35);
+}
+
+/* ─── Stepper Controls ─── */
 .control-stepper {
   display: inline-flex;
   align-items: center;
@@ -168,12 +287,12 @@
 }
 
 .stepper-btn {
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  color: var(--color-text);
+  color: var(--color-text, #e2e8f0);
   font-family: var(--font-display);
   font-weight: 800;
   font-size: 1.1rem;
@@ -185,8 +304,8 @@
 }
 .stepper-btn:hover:not(:disabled) {
   background: rgba(245, 158, 11, 0.25);
-  border-color: var(--gold);
-  color: var(--gold-light);
+  border-color: #f59e0b;
+  color: #fcd34d;
 }
 .stepper-btn:disabled {
   opacity: 0.35;
@@ -194,18 +313,18 @@
 }
 
 .stepper-val {
-  min-width: 60px;
+  min-width: 52px;
   text-align: center;
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   color: #ffffff;
 }
 
 /* ─── Tile Selector Chips ─── */
 .tile-chips-row {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   flex-wrap: wrap;
 }
 
@@ -213,24 +332,288 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 10px;
+  padding: 5px 10px;
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
   cursor: pointer;
   transition: all 0.2s ease;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.8);
 }
 .tile-chip:hover {
   background: rgba(245, 158, 11, 0.12);
-  border-color: var(--gold);
+  border-color: #f59e0b;
 }
 .tile-chip.active {
   background: rgba(245, 158, 11, 0.22);
-  border-color: var(--gold);
+  border-color: #f59e0b;
+  color: #fcd34d;
   box-shadow: 0 0 12px rgba(245, 158, 11, 0.3);
 }
 
-/* ─── Status Match Indicators ─── */
+/* ─── Strip Display (Horizontal Tile Sequence) ─── */
+.strip-display {
+  display: flex;
+  gap: 6px;
+  padding: 10px;
+  background: rgba(10, 14, 30, 0.7);
+  border-radius: 12px;
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  align-items: flex-end;
+  justify-content: center;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+}
+.strip-display.target {
+  border-color: #f59e0b;
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.25);
+}
+.strip-display.matched {
+  border-color: #10b981;
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.35);
+}
+
+.strip-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 5px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+.strip-tile-label {
+  font-family: var(--font-display);
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: var(--color-text-muted, #94a3b8);
+}
+
+/* ─── Figure Gallery (Growing Figures Display) ─── */
+.figure-gallery {
+  display: flex;
+  gap: 8px;
+  padding: 10px;
+  background: rgba(10, 14, 30, 0.7);
+  border-radius: 12px;
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.figure-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  transition: all 0.3s ease;
+}
+.figure-card.mystery {
+  border-style: dashed;
+  border-color: rgba(245, 158, 11, 0.5);
+  background: rgba(245, 158, 11, 0.08);
+}
+.figure-card-label {
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #cbd5e1;
+}
+.figure-card-label.gold {
+  color: #fcd34d;
+}
+.figure-arrow {
+  color: rgba(255, 255, 255, 0.2);
+  font-size: 1rem;
+  align-self: center;
+}
+
+/* ─── Prediction Grid ─── */
+.prediction-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+.prediction-btn {
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-align: center;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-text, #e2e8f0);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  min-height: 40px;
+  line-height: 1.2;
+}
+.prediction-btn:hover:not(.correct):not(.wrong):not(:disabled) {
+  border-color: rgba(245, 158, 11, 0.55);
+  background: rgba(245, 158, 11, 0.1);
+  transform: translateY(-1px);
+}
+.prediction-btn.correct {
+  border-color: #00e676;
+  background: rgba(0, 230, 118, 0.2);
+  color: #00e676;
+  box-shadow: 0 0 14px rgba(0, 230, 118, 0.4);
+}
+.prediction-btn.wrong {
+  border-color: #ff5252;
+  background: rgba(255, 82, 82, 0.18);
+  color: #ff8a80;
+  animation: shake 0.38s ease;
+}
+.prediction-btn:disabled:not(.correct):not(.wrong) {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ─── Mosaic Tile Slots (Spot the Broken Tile) ─── */
+.tile-strip-row {
+  display: flex;
+  gap: 8px;
+  padding: 10px 12px;
+  background: rgba(10, 14, 30, 0.7);
+  border-radius: 12px;
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  justify-content: center;
+  align-items: flex-end;
+}
+
+.mosaic-tile-slot {
+  width: clamp(54px, 6.5vw, 70px);
+  height: clamp(54px, 6.5vw, 70px);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s ease;
+  position: relative;
+  cursor: pointer;
+}
+.mosaic-tile-slot:hover {
+  transform: scale(1.06);
+  border-color: rgba(245, 158, 11, 0.5);
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.25);
+}
+.mosaic-tile-slot.active {
+  border-color: #f59e0b;
+  background: rgba(245, 158, 11, 0.1);
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.4);
+}
+.mosaic-tile-slot.flawed {
+  border-color: #f43f5e;
+  background: rgba(244, 63, 94, 0.15);
+  animation: pulseGlow 1.2s ease-in-out infinite;
+}
+.mosaic-tile-slot.repaired {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.15);
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.4);
+}
+.tile-step-label {
+  font-family: var(--font-display);
+  font-size: 0.6rem;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.5);
+  position: absolute;
+  bottom: 2px;
+}
+
+/* ─── Scenario Description Card ─── */
+.scenario-desc-card {
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #cbd5e1;
+  line-height: 1.4;
+}
+
+/* ─── Repair / Correction Options Grid ─── */
+.repair-options-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 6px;
+}
+.repair-btn {
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-align: left;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-text, #e2e8f0);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  line-height: 1.3;
+}
+.repair-btn:hover:not(.correct):not(.wrong):not(:disabled) {
+  border-color: rgba(245, 158, 11, 0.55);
+  background: rgba(245, 158, 11, 0.1);
+}
+.repair-btn.correct {
+  border-color: #00e676;
+  background: rgba(0, 230, 118, 0.2);
+  color: #00e676;
+  box-shadow: 0 0 14px rgba(0, 230, 118, 0.4);
+}
+.repair-btn.wrong {
+  border-color: #ff5252;
+  background: rgba(255, 82, 82, 0.18);
+  color: #ff8a80;
+  animation: shake 0.38s ease;
+}
+
+/* ─── Hint Card ─── */
+.hint-card {
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 0.78rem;
+  color: var(--color-text-muted, #94a3b8);
+  line-height: 1.4;
+}
+
+/* ─── Concept Gate Box ─── */
+.concept-gate {
+  padding: 10px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.concept-gate-title {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #fcd34d;
+  margin: 0;
+}
+
+/* ─── Match Status Indicators ─── */
 .match-status-badge {
   display: flex;
   align-items: center;
@@ -240,19 +623,59 @@
   border-radius: 12px;
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: 0.95rem;
+  font-size: 0.88rem;
   text-align: center;
+  flex-shrink: 0;
 }
 .match-status-badge.matched {
   background: rgba(16, 185, 129, 0.2);
-  border: 1.5px solid var(--green);
-  color: var(--green-light);
+  border: 1.5px solid var(--green, #10b981);
+  color: var(--green-light, #86efac);
   box-shadow: 0 0 16px rgba(16, 185, 129, 0.3);
 }
 .match-status-badge.unmatched {
   background: rgba(245, 158, 11, 0.15);
-  border: 1.5px solid var(--gold);
-  color: var(--gold-light);
+  border: 1.5px solid var(--gold, #f59e0b);
+  color: var(--gold-light, #fcd34d);
+}
+
+/* ─── Match Meter Bar ─── */
+.match-meter {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 12px;
+  background: rgba(12, 10, 32, 0.7);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+}
+.match-meter-label {
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #cbd5e1;
+}
+.match-meter-track {
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+.match-meter-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #f59e0b, #10b981);
+  transition: width 0.4s ease;
+}
+
+/* ─── Station Actions Bar ─── */
+.station-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 /* ─── Success Completion Panel ─── */
@@ -260,11 +683,48 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
-  padding: 16px;
-  border-radius: var(--radius-md);
+  gap: 10px;
+  padding: 14px;
+  border-radius: var(--radius-md, 14px);
   background: rgba(16, 185, 129, 0.15);
-  border: 2px solid var(--green);
+  border: 2px solid var(--green, #10b981);
   text-align: center;
   box-shadow: 0 0 24px rgba(16, 185, 129, 0.3);
+}
+.success-text {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: var(--green-light, #86efac);
+}
+
+/* ─── Animations ─── */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 8px rgba(244, 63, 94, 0.3); }
+  50% { box-shadow: 0 0 20px rgba(244, 63, 94, 0.6); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(30px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes bounceIn {
+  0%   { opacity: 0; transform: scale(0.8); }
+  60%  { opacity: 1; transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.anim-slide-up {
+  animation: slideInRight 0.4s ease forwards;
+}
+.anim-bounce-in {
+  animation: bounceIn 0.45s ease forwards;
 }

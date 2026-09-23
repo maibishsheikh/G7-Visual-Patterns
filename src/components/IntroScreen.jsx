@@ -1,5 +1,5 @@
 // src/components/IntroScreen.jsx
-// Main Welcome & Navigation Screen for MosaicQuest (Grade 7 · Visual Patterns)
+// Single-viewport welcome screen for MosaicQuest (Grade 7 · Visual Patterns)
 
 import React from 'react';
 import './IntroScreen.css';
@@ -7,11 +7,11 @@ import { generateSessionQuestions } from '../utils/shuffle.js';
 import questionBank from '../data/questionBank.js';
 
 const JOURNEY = [
-  { num: '01', icon: '🔍', label: 'Wonder',   desc: 'The Broken Panel mystery' },
-  { num: '02', icon: '📖', label: 'Story',    desc: 'Nadia & Arjun\'s commission' },
-  { num: '03', icon: '🧪', label: 'Simulate', desc: '4 interactive spatial labs' },
-  { num: '04', icon: '🎮', label: 'Practice', desc: '10 worlds & master critiques' },
-  { num: '05', icon: '📓', label: 'Reflect',  desc: 'Review & Master Artisan rank' },
+  { num: '01', icon: '🔍', label: 'Wonder',   desc: 'The Broken Panel' },
+  { num: '02', icon: '📖', label: 'Story',    desc: 'Nadia & Arjun' },
+  { num: '03', icon: '🧪', label: 'Simulate', desc: '4 spatial labs' },
+  { num: '04', icon: '🎮', label: 'Practice', desc: '10 worlds' },
+  { num: '05', icon: '📓', label: 'Reflect',  desc: 'Master rank' },
 ];
 
 export default function IntroScreen({ state, dispatch }) {
@@ -22,101 +22,95 @@ export default function IntroScreen({ state, dispatch }) {
     dispatch({ type: 'SET_PHASE', payload: 'wonder' });
   }
 
+  function resumeSession() {
+    dispatch({ type: 'SET_PHASE', payload: state.savedPhase || 'wonder' });
+  }
+
+  function jumpToPhase(label) {
+    const phase = label.toLowerCase() === 'practice' ? 'play' : label.toLowerCase();
+    dispatch({ type: 'SET_PHASE', payload: phase });
+  }
+
   return (
     <div className="intro-wrap">
       {/* Top Curriculum Tag */}
       <div className="intro-top-badge">
-        ✨ Singapore Math · Grade 7 (Secondary 1) · Visual Patterns
+        ✨ Singapore Math · Grade 7 · Visual Patterns
       </div>
 
-      {/* Main Title */}
+      {/* Title */}
       <h1 className="intro-title">
         <span className="text-orange">Mosaic</span> <span className="text-white">Quest</span>
       </h1>
       <h2 className="intro-subtitle">
-        Spatial Patterns · Repeating Motifs, Rotations, Reflections &amp; Symmetry
+        Repeating Motifs · Rotations · Reflections &amp; Symmetry
       </h2>
 
       {/* Mascot Greeting */}
       <div className="intro-mascot-row">
-        <div className="intro-mascot-circle" style={{ background: 'radial-gradient(circle, #34d399, #059669)' }}>
-          🦎
-        </div>
+        <div className="intro-mascot-circle">🦎</div>
         <div className="intro-speech-bubble">
-          Greetings, apprentice! I'm Kaleido the Chameleon. Ready to explore the mosaic workshop,
-          master rotations and reflections, and restore the ancient panels? 🎨📐
+          Greetings, apprentice! I'm <strong>Kaleido</strong>. Ready to master rotations, reflections, and restore the ancient mosaic panels? 🎨📐
         </div>
       </div>
 
-      {/* Module Overview Description */}
+      {/* Description */}
       <p className="intro-desc">
-        Learn how to identify repeating motifs, distinguish repeating from growing patterns, continue rotation &amp; reflection sequences, find line and rotational symmetry, and predict far figures with geometric proof!
+        Identify repeating motifs, continue rotation &amp; reflection sequences, find symmetry, and predict far figures with geometric proof!
       </p>
 
-      {/* 5-Phase Journey Card */}
+      {/* Journey Card — single row */}
       <div className="journey-card">
-        <div className="journey-card-title">YOUR LEARNING JOURNEY · CLICK ANY PHASE TO JUMP IN</div>
+        <div className="journey-card-title">YOUR LEARNING JOURNEY · CLICK ANY PHASE</div>
 
-        <div className="journey-steps-container">
-          <div className="journey-row top-row">
-            {JOURNEY.slice(0, 3).map((j, i) => (
-              <React.Fragment key={j.num}>
-                <div
-                  className="journey-step-item clickable-step"
-                  onClick={() =>
-                    dispatch({
-                      type: 'SET_PHASE',
-                      payload: j.label.toLowerCase() === 'practice' ? 'play' : j.label.toLowerCase(),
-                    })
-                  }
-                  role="button"
-                  tabIndex={0}
-                  title={`Click to open ${j.label} phase`}
-                >
-                  <span className="journey-icon-circle">{j.icon}</span>
-                  <div className="journey-text-col">
-                    <span className="journey-item-title">{j.label}</span>
-                    <span className="journey-item-desc">{j.desc}</span>
-                  </div>
+        <div className="journey-steps-row">
+          {JOURNEY.map((j, i) => (
+            <React.Fragment key={j.num}>
+              <div
+                className="clickable-step"
+                onClick={() => jumpToPhase(j.label)}
+                role="button"
+                tabIndex={0}
+                title={`Open ${j.label} phase`}
+              >
+                <span className="journey-icon-circle">{j.icon}</span>
+                <div className="journey-text-col">
+                  <span className="journey-item-title">{j.label}</span>
+                  <span className="journey-item-desc">{j.desc}</span>
                 </div>
-                <span className={`journey-arrow ${i === 2 ? 'fade-arrow' : ''}`}>→</span>
-              </React.Fragment>
-            ))}
-          </div>
-
-          <div className="journey-row bottom-row">
-            {JOURNEY.slice(3, 5).map((j, i) => (
-              <React.Fragment key={j.num}>
-                <div
-                  className="journey-step-item clickable-step"
-                  onClick={() =>
-                    dispatch({
-                      type: 'SET_PHASE',
-                      payload: j.label.toLowerCase() === 'practice' ? 'play' : j.label.toLowerCase(),
-                    })
-                  }
-                  role="button"
-                  tabIndex={0}
-                  title={`Click to open ${j.label} phase`}
-                >
-                  <span className="journey-icon-circle">{j.icon}</span>
-                  <div className="journey-text-col">
-                    <span className="journey-item-title">{j.label}</span>
-                    <span className="journey-item-desc">{j.desc}</span>
-                  </div>
-                </div>
-                {i === 0 && <span className="journey-arrow">→</span>}
-              </React.Fragment>
-            ))}
-          </div>
+              </div>
+              {i < JOURNEY.length - 1 && <span className="journey-arrow">→</span>}
+            </React.Fragment>
+          ))}
         </div>
       </div>
 
-      {/* Start Button Row */}
-      <div className="intro-actions-row">
-        <button className="btn btn-primary btn-lg" onClick={startFresh}>
-          Start Workshop Journey 🚀
+      {/* CTA Buttons */}
+      <div className="intro-ctas">
+        <button className="btn btn-primary btn-lg intro-cta-main" onClick={startFresh}>
+          🚀 Begin Your Journey!
         </button>
+        {hasSaved && (
+          <button className="btn btn-outline" onClick={resumeSession}>
+            ↩ Resume
+          </button>
+        )}
+      </div>
+
+      {/* Bottom Stats */}
+      <div className="intro-bottom-cards">
+        <div className="bottom-card">
+          <div className="bottom-card-icon" style={{ color: '#ff6b6b' }}>🎯</div>
+          <div>100 Questions</div>
+        </div>
+        <div className="bottom-card">
+          <div className="bottom-card-icon" style={{ color: '#feca57' }}>🌍</div>
+          <div>10 Worlds</div>
+        </div>
+        <div className="bottom-card">
+          <div className="bottom-card-icon" style={{ color: '#66bb6a' }}>✨</div>
+          <div>Badges &amp; XP</div>
+        </div>
       </div>
     </div>
   );
