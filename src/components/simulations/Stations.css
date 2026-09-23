@@ -1,0 +1,270 @@
+/* src/components/simulations/Stations.css */
+/* Responsive, accessible styles for MosaicQuest Simulation Stations */
+
+.station-wrap {
+  flex: 1;
+  min-height: 0;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: clamp(6px, 1vh, 12px) clamp(8px, 1.2vw, 16px);
+  gap: clamp(6px, 1vh, 10px);
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* ─── Station Header ─── */
+.station-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex-shrink: 0;
+  width: 100%;
+}
+
+.station-title {
+  color: var(--gold-light);
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(1.1rem, 1.4vw, 1.4rem);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.station-badge {
+  background: rgba(245, 158, 11, 0.2);
+  border: 1.5px solid var(--gold);
+  border-radius: var(--radius-pill);
+  padding: 4px 12px;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--gold-light);
+}
+
+/* ─── 2-Column Responsive Layout ─── */
+.station-grid-2col {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: clamp(10px, 1.4vw, 16px);
+  align-items: stretch;
+  flex: 1;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .station-grid-2col {
+    grid-template-columns: 1fr;
+  }
+}
+
+.station-card-panel {
+  background: rgba(22, 27, 56, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-md);
+  padding: clamp(10px, 1.5vw, 16px);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+}
+
+.panel-title {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ─── Interactive Tile Grid Board ─── */
+.mosaic-board-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  padding: 12px;
+  background: rgba(10, 14, 30, 0.65);
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-md);
+  justify-items: center;
+  align-items: center;
+}
+
+.mosaic-tile-slot {
+  width: 64px;
+  height: 64px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s ease;
+  position: relative;
+}
+
+.mosaic-tile-slot.active {
+  border-color: var(--gold);
+  background: rgba(245, 158, 11, 0.1);
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.3);
+}
+
+.mosaic-tile-slot.clickable {
+  cursor: pointer;
+}
+.mosaic-tile-slot.clickable:hover {
+  transform: scale(1.05);
+  border-color: var(--gold-light);
+}
+
+.mosaic-tile-slot.flawed {
+  border-color: var(--red);
+  background: rgba(244, 63, 94, 0.15);
+  animation: shake 0.6s infinite ease-in-out;
+}
+
+/* ─── Controls & Steppers ─── */
+.controls-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.control-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 6px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.control-label {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+
+.control-stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.stepper-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--color-text);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+.stepper-btn:hover:not(:disabled) {
+  background: rgba(245, 158, 11, 0.25);
+  border-color: var(--gold);
+  color: var(--gold-light);
+}
+.stepper-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.stepper-val {
+  min-width: 60px;
+  text-align: center;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: #ffffff;
+}
+
+/* ─── Tile Selector Chips ─── */
+.tile-chips-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.tile-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.tile-chip:hover {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: var(--gold);
+}
+.tile-chip.active {
+  background: rgba(245, 158, 11, 0.22);
+  border-color: var(--gold);
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.3);
+}
+
+/* ─── Status Match Indicators ─── */
+.match-status-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 12px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.95rem;
+  text-align: center;
+}
+.match-status-badge.matched {
+  background: rgba(16, 185, 129, 0.2);
+  border: 1.5px solid var(--green);
+  color: var(--green-light);
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.3);
+}
+.match-status-badge.unmatched {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1.5px solid var(--gold);
+  color: var(--gold-light);
+}
+
+/* ─── Success Completion Panel ─── */
+.station-success-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border-radius: var(--radius-md);
+  background: rgba(16, 185, 129, 0.15);
+  border: 2px solid var(--green);
+  text-align: center;
+  box-shadow: 0 0 24px rgba(16, 185, 129, 0.3);
+}
