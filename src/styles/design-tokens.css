@@ -1,0 +1,75 @@
+/* ════════════════════════════════════════════
+   MosaicQuest Design Tokens — Grade 7 Visual Patterns
+   ════════════════════════════════════════════ */
+
+:root {
+  /* ── Core Palette (Studio Dark Theme) ── */
+  --color-bg: #090d20;
+  --color-bg-dark: #050713;
+  --color-surface: rgba(22, 27, 56, 0.78);
+  --color-surface-hover: rgba(33, 40, 80, 0.85);
+  --color-surface-card: rgba(18, 22, 48, 0.85);
+  --color-border: rgba(255, 255, 255, 0.12);
+  --color-border-glow: rgba(245, 158, 11, 0.35);
+
+  --color-primary: #f59e0b;     /* Kiln gold — CTAs & highlights */
+  --color-secondary: #8b5cf6;   /* Royal violet — secondary actions */
+  --color-accent: #10b981;      /* Jade green — correct checks */
+  --color-error: #f43f5e;       /* Ruby red — incorrect alerts */
+  --color-text: #ffffff;
+  --color-text-muted: rgba(255, 255, 255, 0.65);
+  --color-text-dim: rgba(255, 255, 255, 0.42);
+
+  /* ── Aliases ── */
+  --gold: #f59e0b;
+  --gold-light: #fcd34d;
+  --purple: #8b5cf6;
+  --purple-light: #c4b5fd;
+  --green: #10b981;
+  --green-light: #6ee7b7;
+  --red: #f43f5e;
+  --red-light: #fda4af;
+
+  /* ── Character Palette (TRD §4.2) ── */
+  --char-1: #f59e0b;    /* Nadia — detail-eyed apprentice (Amber) */
+  --char-2: #06b6d4;    /* Arjun — direction-precise apprentice (Cyan) */
+  --mascot: #10b981;    /* Kaleido the Chameleon (Emerald) */
+
+  /* ── 10 Curated Mosaic World Accents (TRD §9) ── */
+  --world-0: #C08497;   /* The First Motif — dusty rose tile */
+  --world-1: #6A4C93;   /* Growing or Repeating? — violet */
+  --world-2: #1982C4;   /* Counting the Tiles — cobalt */
+  --world-3: #8AC926;   /* Straight Growth or Curved Growth? — lime */
+  --world-4: #FFCA3A;   /* The Spinning Tile — kiln gold */
+  --world-5: #52B788;   /* Mirror, Mirror — glaze green */
+  --world-6: #F15BB5;   /* Finding the Symmetry — rose pink */
+  --world-7: #4D908E;   /* Design the Far Tile — teal slate */
+  --world-8: #B56576;   /* The Mosaic Commission — terracotta */
+  --world-9: #9B2226;   /* The Grand Exhibition — gallery crimson */
+
+  /* ── Typography (Google Fonts: Outfit / Nunito / Fredoka) ── */
+  --font-display: 'Outfit', 'Fredoka', system-ui, -apple-system, sans-serif;
+  --font-body: 'Nunito', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --font-emoji: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif;
+
+  /* ── Radii ── */
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-pill: 999px;
+
+  /* ── Shadows & Glows ── */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 8px 30px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.6);
+  --shadow-glow-gold: 0 0 28px rgba(245, 158, 11, 0.38);
+  --shadow-glow-emerald: 0 0 28px rgba(16, 185, 129, 0.38);
+  --shadow-glow-purple: 0 0 28px rgba(139, 92, 246, 0.38);
+
+  /* ── Transitions ── */
+  --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-spring: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
