@@ -7,56 +7,64 @@ import './Stations.css';
 import { MOTIF_CATALOG, applyRotation, applyReflection, getRotationOrientationName } from '../../utils/visualPatternMath.js';
 import { useAudio } from '../../hooks/useAudio.js';
 
+const DIRECTION_LABELS = { 0: 'N', 90: 'E', 180: 'S', 270: 'W' };
+
+function getGateQuestion(motifName, angle) {
+  const resultAngle = (angle + 180) % 360;
+  const resultDir = getRotationOrientationName(resultAngle);
+  const startDir = getRotationOrientationName(angle);
+  return {
+    prompt: `If the ${motifName} is currently facing ${startDir} (${angle}°) and you apply a 180° half-turn, which direction will it face?`,
+    correct: `${resultDir} (${resultAngle}°)`,
+    options: [0, 90, 180, 270].map(a => `${getRotationOrientationName(a)} (${a}°)`),
+  };
+}
+
 export default function KaleidoscopeWallLab({ onComplete, audioEnabled }) {
   const { narrate, sounds } = useAudio(audioEnabled);
-  const [selectedMotifIndex, setSelectedMotifIndex] = useState(0); // L-tile
-  const [angle, setAngle] = useState(0); // 0, 90, 180, 270
+  const [selectedMotifIndex, setSelectedMotifIndex] = useState(0);
+  const [angle, setAngle] = useState(0);
   const [direction, setDirection] = useState('clockwise');
-  const [flipMode, setFlipMode] = useState('none'); // 'none', 'vertical', 'horizontal'
+  const [flipMode, setFlipMode] = useState('none');
 
-  // Concept Confirmation Question
+  // Gate state
   const [answeredQuestion, setAnsweredQuestion] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
   const [isCorrectQuestion, setIsCorrectQuestion] = useState(false);
 
   const baseMotif = MOTIF_CATALOG[selectedMotifIndex];
 
-  // Calculate current transformed motif
-  let transformed = applyRotation(baseMotif, angle, direction);
-  if (flipMode === 'vertical') transformed = applyReflection(transformed, 'vertical');
-  if (flipMode === 'horizontal') transformed = applyReflection(transformed, 'horizontal');
-
   function handleRotateStep(delta) {
     sounds.click();
-    setAngle((prev) => (prev + delta + 360) % 360);
+    setAngle(prev => (prev + delta + 360) % 360);
   }
 
   function handleFlipToggle(mode) {
     sounds.click();
-    setFlipMode((prev) => (prev === mode ? 'none' : mode));
+    setFlipMode(prev => (prev === mode ? 'none' : mode));
   }
+
+  const gate = getGateQuestion(baseMotif.name, angle);
 
   function handleAnswer(ans) {
     setSelectedOption(ans);
-    if (ans === 'Pointing Down (South)') {
+    if (ans === gate.correct) {
       sounds.correct();
       setIsCorrectQuestion(true);
       setAnsweredQuestion(true);
-      narrate([{ text: "Spot on! A half-turn of 180 degrees turns an upward-pointing motif directly downward!", style: 'celebration' }]);
+      narrate([{ text: `Spot on! A half-turn of 180 degrees flips the direction!`, style: 'celebration' }]);
     } else {
       sounds.wrong();
       setIsCorrectQuestion(false);
-      narrate([{ text: "Think carefully: 180 degrees is two 90-degree quarter turns in a row. Try again!", style: 'encouragement' }]);
+      narrate([{ text: 'Think carefully: 180° is two quarter-turns. Try again!', style: 'encouragement' }]);
     }
   }
 
-  // Render SVG motif preview
-  function renderMotifSvg(m, size = 52) {
-    const scale = size / 100;
+  function renderMotifSvg(m, rot, flipH, flipV, size = 60) {
     const transform = `
       translate(50, 50)
-      scale(${m.flipH ? -1 : 1}, ${m.flipV ? -1 : 1})
-      rotate(${m.rotation || 0})
+      scale(${flipH ? -1 : 1}, ${flipV ? -1 : 1})
+      rotate(${rot})
       translate(-50, -50)
     `;
     return (
@@ -71,95 +79,44 @@ export default function KaleidoscopeWallLab({ onComplete, audioEnabled }) {
 
   return (
     <div className="station-wrap">
-      {/* Station Header */}
+      {/* Header */}
       <div className="station-header">
-        <h3 className="station-title">
-          <span>🌀</span> Station 1: The Kaleidoscope Wall Lab
-        </h3>
-        <span className="station-badge">Concept Discovery Lab</span>
+        <h3 className="station-title">🌀 Station 1: The Kaleidoscope Wall Lab</h3>
+        <span className="station-badge">Concept Discovery</span>
       </div>
 
       <div className="station-grid-2col">
-        {/* Left Column: Interactive Mosaic Canvas */}
+        {/* Left: Live Preview */}
         <div className="station-card-panel">
-          <div className="panel-title">
-            <span>🎨</span> Mosaic Wall Live Preview
-          </div>
+          <div className="panel-title"><span>🎨</span> Mosaic Wall Live Preview</div>
 
-          {/* 3x3 Kaleidoscope Wall */}
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(3, 1fr)',
-              gap: '8px',
-              padding: '12px',
-              background: 'rgba(10, 14, 30, 0.7)',
-              borderRadius: '14px',
-              border: '1.5px solid rgba(255, 255, 255, 0.1)',
-              justifyItems: 'center',
-            }}
-          >
+          <div className="tile-grid-3x3">
             {Array.from({ length: 9 }).map((_, idx) => {
-              // Alternate rotation/reflection to show kaleidoscope effect
               const cellRot = (angle + (idx % 2 === 0 ? 0 : 90)) % 360;
               const cellFlipH = flipMode === 'vertical' ? (idx % 2 === 1) : false;
               const cellFlipV = flipMode === 'horizontal' ? (idx > 2) : false;
+              const cellDir = DIRECTION_LABELS[cellRot] || '';
 
               return (
-                <div
-                  key={idx}
-                  style={{
-                    width: '68px',
-                    height: '68px',
-                    borderRadius: '10px',
-                    background: 'rgba(255, 255, 255, 0.04)',
-                    border: '1px solid rgba(255, 255, 255, 0.12)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
-                  }}
-                >
-                  {renderMotifSvg(
-                    {
-                      ...baseMotif,
-                      rotation: cellRot,
-                      flipH: cellFlipH,
-                      flipV: cellFlipV,
-                    },
-                    54
-                  )}
+                <div key={idx} className="tile-cell">
+                  {renderMotifSvg(baseMotif, cellRot, cellFlipH, cellFlipV, 54)}
+                  <span className="tile-cell-label">{cellDir}</span>
                 </div>
               );
             })}
           </div>
 
-          {/* Current Orientation Status Badge (Never color-only!) */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: '6px 12px',
-              borderRadius: '10px',
-              background: 'rgba(255, 255, 255, 0.05)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-            }}
-          >
-            <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--color-text-muted)' }}>
-              Current State:
-            </span>
-            <span style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--gold-light)' }}>
+          <div className="orientation-status">
+            <span className="orientation-label">Current State:</span>
+            <span className="orientation-value">
               {angle}° {direction.toUpperCase()} · {flipMode === 'none' ? 'No Flip' : `${flipMode.toUpperCase()} Flip`}
             </span>
           </div>
         </div>
 
-        {/* Right Column: Controls & Confirmation Question */}
+        {/* Right: Controls + Gate */}
         <div className="station-card-panel">
-          <div className="panel-title">
-            <span>⚙️</span> Transformation Controls
-          </div>
+          <div className="panel-title"><span>⚙️</span> Transformation Controls</div>
 
           {/* Motif Selector */}
           <div className="controls-group">
@@ -169,112 +126,64 @@ export default function KaleidoscopeWallLab({ onComplete, audioEnabled }) {
                 <button
                   key={m.id}
                   className={`tile-chip ${selectedMotifIndex === idx ? 'active' : ''}`}
-                  onClick={() => {
-                    sounds.click();
-                    setSelectedMotifIndex(idx);
-                  }}
+                  onClick={() => { sounds.click(); setSelectedMotifIndex(idx); }}
                 >
-                  <span>{m.name.split(' ')[0]}</span>
+                  {m.name.split(' ')[0]}
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Rotation Dial / Stepper */}
+          {/* Rotation */}
           <div className="control-row">
-            <span className="control-label">2. Rotation Angle:</span>
+            <span className="control-label">2. Rotation:</span>
             <div className="control-stepper">
-              <button
-                className="stepper-btn"
-                onClick={() => handleRotateStep(-90)}
-                aria-label="Rotate 90 degrees anti-clockwise"
-              >
-                ↶
-              </button>
+              <button className="stepper-btn" onClick={() => handleRotateStep(-90)} aria-label="Rotate anti-clockwise">↶</button>
               <span className="stepper-val">{angle}°</span>
-              <button
-                className="stepper-btn"
-                onClick={() => handleRotateStep(90)}
-                aria-label="Rotate 90 degrees clockwise"
-              >
-                ↷
-              </button>
+              <button className="stepper-btn" onClick={() => handleRotateStep(90)} aria-label="Rotate clockwise">↷</button>
             </div>
           </div>
 
-          {/* Direction Toggle */}
+          {/* Direction */}
           <div className="control-row">
             <span className="control-label">Direction:</span>
-            <div style={{ display: 'flex', gap: '6px' }}>
+            <div className="control-toggle-group">
               <button
-                className={`btn btn-sm ${direction === 'clockwise' ? 'btn-primary' : 'btn-outline'}`}
-                style={{ padding: '4px 10px', fontSize: '0.8rem' }}
-                onClick={() => {
-                  sounds.click();
-                  setDirection('clockwise');
-                }}
-              >
-                Clockwise
-              </button>
+                className={`control-toggle-btn ${direction === 'clockwise' ? 'active' : ''}`}
+                onClick={() => { sounds.click(); setDirection('clockwise'); }}
+              >Clockwise</button>
               <button
-                className={`btn btn-sm ${direction === 'anticlockwise' ? 'btn-primary' : 'btn-outline'}`}
-                style={{ padding: '4px 10px', fontSize: '0.8rem' }}
-                onClick={() => {
-                  sounds.click();
-                  setDirection('anticlockwise');
-                }}
-              >
-                Anti-clockwise
-              </button>
+                className={`control-toggle-btn ${direction === 'anticlockwise' ? 'active' : ''}`}
+                onClick={() => { sounds.click(); setDirection('anticlockwise'); }}
+              >Anti-CW</button>
             </div>
           </div>
 
-          {/* Flip Toggle */}
+          {/* Flip */}
           <div className="control-row">
-            <span className="control-label">3. Mirror Line (Flip):</span>
-            <div style={{ display: 'flex', gap: '6px' }}>
+            <span className="control-label">3. Mirror Flip:</span>
+            <div className="control-toggle-group">
               <button
-                className={`btn btn-sm ${flipMode === 'vertical' ? 'btn-green' : 'btn-outline'}`}
-                style={{ padding: '4px 10px', fontSize: '0.8rem' }}
+                className={`control-toggle-btn ${flipMode === 'vertical' ? 'active-green' : ''}`}
                 onClick={() => handleFlipToggle('vertical')}
-              >
-                Vertical ↕
-              </button>
+              >Vertical ↕</button>
               <button
-                className={`btn btn-sm ${flipMode === 'horizontal' ? 'btn-green' : 'btn-outline'}`}
-                style={{ padding: '4px 10px', fontSize: '0.8rem' }}
+                className={`control-toggle-btn ${flipMode === 'horizontal' ? 'active-green' : ''}`}
                 onClick={() => handleFlipToggle('horizontal')}
-              >
-                Horizontal ↔
-              </button>
+              >Horizontal ↔</button>
             </div>
           </div>
 
-          {/* Concept Check Gate */}
-          <div
-            style={{
-              marginTop: '8px',
-              padding: '10px',
-              borderRadius: '12px',
-              background: 'rgba(255, 255, 255, 0.05)',
-              border: '1px solid rgba(255, 255, 255, 0.12)',
-            }}
-          >
-            <p style={{ fontSize: '0.82rem', fontWeight: 800, color: 'var(--gold)', margin: '0 0 8px 0' }}>
-              🧠 Discovery Gate: When an upward-pointing motif turns 180° clockwise, which direction does it face?
-            </p>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
-              {[
-                'Pointing Down (South)',
-                'Pointing Up (North)',
-                'Pointing Right (East)',
-                'Pointing Left (West)',
-              ].map((opt) => (
+          {/* Discovery Gate */}
+          <div className="concept-gate">
+            <p className="concept-gate-title">🧠 Discovery Gate: {gate.prompt}</p>
+            <div className="prediction-grid">
+              {gate.options.map(opt => (
                 <button
                   key={opt}
-                  className={`btn btn-sm ${selectedOption === opt ? (isCorrectQuestion ? 'btn-green' : 'btn-outline') : 'btn-outline'}`}
-                  style={{ fontSize: '0.75rem', padding: '6px 8px', whiteSpace: 'normal', textAlign: 'center' }}
+                  className={`prediction-btn ${selectedOption === opt ? (isCorrectQuestion ? 'correct' : 'wrong') : ''}`}
                   onClick={() => handleAnswer(opt)}
+                  disabled={answeredQuestion && isCorrectQuestion}
                 >
                   {opt}
                 </button>
@@ -282,15 +191,11 @@ export default function KaleidoscopeWallLab({ onComplete, audioEnabled }) {
             </div>
           </div>
 
-          {/* Success & Completion CTA */}
+          {/* Complete */}
           {answeredQuestion && isCorrectQuestion && (
-            <div className="station-success-panel anim-slide-up" style={{ padding: '10px' }}>
-              <span style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--green-light)' }}>
-                🎉 Concept Verified! Kaleidoscope Wall Mastered.
-              </span>
-              <button className="btn btn-green btn-sm" onClick={onComplete}>
-                Complete Station 1 ✓
-              </button>
+            <div className="station-success-panel anim-bounce-in">
+              <span className="success-text">🎉 Concept Verified! Kaleidoscope Wall Mastered.</span>
+              <button className="btn btn-green btn-sm" onClick={onComplete}>Complete Station 1 ✓</button>
             </div>
           )}
         </div>

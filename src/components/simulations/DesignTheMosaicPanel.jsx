@@ -1,6 +1,6 @@
 // src/components/simulations/DesignTheMosaicPanel.jsx
-// Station 3: Multi-Step/Composite Construction — Design the Mosaic Panel
-// Student places a motif, selects a transformation rule, renders figures live, and predicts Figure 6.
+// Station 3: Design the Mosaic Panel — Multi-Step Construction
+// Student selects rule, watches Figures 1–4, and predicts Figure 6.
 
 import React, { useState } from 'react';
 import './Stations.css';
@@ -10,7 +10,7 @@ import { useAudio } from '../../hooks/useAudio.js';
 const RULES = [
   {
     id: 'rot-90-cw',
-    label: 'Rotate 90° Clockwise each step',
+    label: 'Rotate 90° CW each step',
     type: 'rotation',
     delta: 90,
     dir: 'clockwise',
@@ -18,74 +18,66 @@ const RULES = [
   },
   {
     id: 'rot-180',
-    label: 'Rotate 180° Half-Turn each step',
+    label: 'Rotate 180° each step',
     type: 'rotation',
     delta: 180,
     dir: 'clockwise',
-    description: 'Each subsequent figure turns a half-turn (180°), alternating facing directions.',
+    description: 'Each figure turns a half-turn, alternating directions.',
   },
   {
     id: 'flip-v',
-    label: 'Reflect across Vertical Mirror Line each step',
+    label: 'Reflect vertically each step',
     type: 'reflection',
     axis: 'vertical',
-    description: 'Each subsequent figure flips across a vertical mirror line, reversing left and right.',
+    description: 'Each figure flips across a vertical mirror line.',
   },
 ];
 
 export default function DesignTheMosaicPanel({ onComplete, audioEnabled }) {
   const { narrate, sounds } = useAudio(audioEnabled);
-  const [selectedMotif, setSelectedMotif] = useState(MOTIF_CATALOG[2]); // Arrow
+  const [selectedMotifIdx, setSelectedMotifIdx] = useState(2); // Arrow
   const [selectedRuleId, setSelectedRuleId] = useState('rot-90-cw');
   const [predictedFig6, setPredictedFig6] = useState(null);
   const [isPredictionCorrect, setIsPredictionCorrect] = useState(false);
 
-  const activeRule = RULES.find((r) => r.id === selectedRuleId) || RULES[0];
+  const motif = MOTIF_CATALOG[selectedMotifIdx];
+  const activeRule = RULES.find(r => r.id === selectedRuleId) || RULES[0];
 
-  // Compute orientations for Figures 1 to 4
-  const generatedFigures = [1, 2, 3, 4].map((figNum) => {
-    const stepIdx = figNum - 1;
-    let angle = 0;
-    let flipH = false;
-
+  // Compute Figures 1–4
+  const figures = [1, 2, 3, 4].map(n => {
+    const stepIdx = n - 1;
+    let angle = 0, flipH = false;
     if (activeRule.type === 'rotation') {
       angle = (stepIdx * activeRule.delta) % 360;
-    } else if (activeRule.type === 'reflection') {
+    } else {
       flipH = stepIdx % 2 === 1;
     }
-
-    return { figNum, angle, flipH };
+    return { figNum: n, angle, flipH };
   });
 
-  // Calculate true Figure 6:
-  // Step 6 is stepIdx = 5
-  let trueFig6Angle = 0;
-  let trueFig6FlipH = false;
-  let targetDescription = '';
-
+  // True Figure 6 (stepIdx = 5)
+  let trueFig6Angle = 0, trueFig6FlipH = false, targetDescription = '';
   if (activeRule.type === 'rotation') {
     trueFig6Angle = (5 * activeRule.delta) % 360;
-    targetDescription = getRotationOrientationName(trueFig6Angle);
+    targetDescription = `${getRotationOrientationName(trueFig6Angle)} (${trueFig6Angle}°)`;
   } else {
-    trueFig6FlipH = 5 % 2 === 1; // odd -> flipped!
-    targetDescription = 'Reversed (Flipped across vertical line)';
+    trueFig6FlipH = true; // 5 % 2 === 1
+    targetDescription = 'Reflected (Flipped across vertical line)';
   }
 
-  // Generate 4 candidate options for Figure 6
+  // Generate 4 UNIQUE candidate options — fixes duplicate bug
   let candidateOptions = [];
   if (activeRule.type === 'rotation') {
-    candidateOptions = [
-      getRotationOrientationName(trueFig6Angle),
-      getRotationOrientationName((trueFig6Angle + 90) % 360),
-      getRotationOrientationName((trueFig6Angle + 180) % 360),
-      getRotationOrientationName((trueFig6Angle + 270) % 360),
-    ];
+    // Use angle-based labels which are always unique
+    candidateOptions = [0, 90, 180, 270].map(a =>
+      `${getRotationOrientationName(a)} (${a}°)`
+    );
   } else {
     candidateOptions = [
-      'Reversed (Flipped across vertical line)',
-      'Unchanged (Slid across without flipping — translation)',
+      'Reflected (Flipped across vertical line)',
+      'Unchanged (Slid without flipping — translation)',
       'Rotated 180° upside down',
-      'Inverted in colour only',
+      'Rotated 90° clockwise',
     ];
   }
 
@@ -98,191 +90,134 @@ export default function DesignTheMosaicPanel({ onComplete, audioEnabled }) {
 
   function handleSelectPrediction(opt) {
     setPredictedFig6(opt);
-    const correct = opt === targetDescription;
-    if (correct) {
+    if (opt === targetDescription) {
       sounds.correct();
       setIsPredictionCorrect(true);
-      narrate([
-        {
-          text: `Brilliant spatial reasoning! You predicted Figure 6 (${targetDescription}) without drawing it out!`,
-          style: 'celebration',
-        },
-      ]);
+      narrate([{ text: `Brilliant spatial reasoning! You predicted Figure 6 correctly!`, style: 'celebration' }]);
     } else {
       sounds.wrong();
       setIsPredictionCorrect(false);
-      narrate([
-        {
-          text: 'Look at the pattern cycle again: calculate the transform for Step 6 step-by-step.',
-          style: 'encouragement',
-        },
-      ]);
+      narrate([{ text: 'Look at the cycle pattern again: calculate step-by-step.', style: 'encouragement' }]);
     }
   }
 
-  function renderFigSvg(figNum, angle, flipH, size = 48) {
+  function renderFigSvg(angle, flipH, size = 52) {
     const transform = `
       translate(50, 50)
       scale(${flipH ? -1 : 1}, 1)
       rotate(${angle})
       translate(-50, -50)
     `;
-
     return (
-      <div
-        key={figNum}
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: '4px',
-          padding: '8px',
-          borderRadius: '12px',
-          background: 'rgba(255, 255, 255, 0.05)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-        }}
-      >
-        <svg width={size} height={size} viewBox="0 0 100 100">
-          <g transform={transform}>
-            <rect width="90" height="90" x="5" y="5" rx="8" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.15)" strokeWidth="1.5" />
-            <path d={selectedMotif.svgPath} fill={selectedMotif.color} stroke={selectedMotif.accentColor || '#ffffff'} strokeWidth="3" strokeLinejoin="round" />
-          </g>
-        </svg>
-        <span style={{ fontSize: '0.72rem', fontWeight: 800, color: 'var(--gold)' }}>
-          Figure {figNum}
-        </span>
-        <span style={{ fontSize: '0.65rem', color: 'var(--color-text-dim)' }}>
-          {activeRule.type === 'rotation' ? `${angle}°` : flipH ? 'Flipped' : 'Normal'}
-        </span>
-      </div>
+      <svg width={size} height={size} viewBox="0 0 100 100">
+        <g transform={transform}>
+          <rect width="90" height="90" x="5" y="5" rx="8" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.15)" strokeWidth="1.5" />
+          <path d={motif.svgPath} fill={motif.color} stroke={motif.accentColor || '#ffffff'} strokeWidth="3" strokeLinejoin="round" />
+        </g>
+      </svg>
     );
   }
 
   return (
     <div className="station-wrap">
-      {/* Station Header */}
+      {/* Header */}
       <div className="station-header">
-        <h3 className="station-title">
-          <span>🏛️</span> Station 3: Design the Mosaic Panel
-        </h3>
-        <span className="station-badge">Multi-Step Construction</span>
+        <h3 className="station-title">🏛️ Station 3: Design the Mosaic Panel</h3>
+        <span className="station-badge">Construction Lab</span>
       </div>
 
       <div className="station-grid-2col">
-        {/* Left Column: Live Rendered Figure Sequence */}
+        {/* Left: Figure Gallery */}
         <div className="station-card-panel">
-          <div className="panel-title">
-            <span>✨</span> Live Generated Mosaic Sequence (Figures 1–4)
-          </div>
+          <div className="panel-title"><span>📐</span> Figure Sequence (Rule: {activeRule.label})</div>
 
-          <div
-            style={{
-              display: 'flex',
-              gap: '10px',
-              justifyContent: 'center',
-              alignItems: 'center',
-              padding: '14px',
-              background: 'rgba(10, 14, 30, 0.7)',
-              borderRadius: '14px',
-              border: '1.5px solid rgba(255, 255, 255, 0.12)',
-              flexWrap: 'wrap',
-            }}
-          >
-            {generatedFigures.map((f) => renderFigSvg(f.figNum, f.angle, f.flipH))}
-
-            {/* Unknown Far Figure 6 Slot */}
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: '68px',
-                height: '84px',
-                borderRadius: '12px',
-                border: '2px dashed var(--gold)',
-                background: 'rgba(245, 158, 11, 0.12)',
-                boxShadow: '0 0 16px rgba(245, 158, 11, 0.25)',
-              }}
-            >
-              <span style={{ fontSize: '1.4rem', fontWeight: 900, color: 'var(--gold)' }}>?</span>
-              <span style={{ fontSize: '0.7rem', fontWeight: 800, color: 'var(--gold-light)' }}>
-                Figure 6
-              </span>
+          {/* Figures 1–4 */}
+          <div className="figure-gallery">
+            {figures.map((fig, idx) => (
+              <React.Fragment key={fig.figNum}>
+                <div className="figure-card">
+                  {renderFigSvg(fig.angle, fig.flipH, 52)}
+                  <span className="figure-card-label">Fig {fig.figNum}</span>
+                </div>
+                {idx < figures.length - 1 && <span className="figure-arrow">→</span>}
+              </React.Fragment>
+            ))}
+            <span className="figure-arrow">→</span>
+            <div className="figure-card">
+              <span className="figure-card-label">Fig 5</span>
+              <span className="figure-card-label" style={{ fontSize: '0.65rem', color: '#94a3b8' }}>…</span>
+            </div>
+            <span className="figure-arrow">→</span>
+            {/* Figure 6 mystery */}
+            <div className={`figure-card mystery ${isPredictionCorrect ? '' : ''}`}>
+              {isPredictionCorrect
+                ? renderFigSvg(trueFig6Angle, trueFig6FlipH, 52)
+                : <span style={{ fontSize: '1.6rem', opacity: 0.5 }}>❓</span>
+              }
+              <span className="figure-card-label gold">Fig 6</span>
             </div>
           </div>
 
-          {/* Active Rule Description */}
-          <div
-            style={{
-              padding: '8px 12px',
-              borderRadius: '10px',
-              background: 'rgba(255, 255, 255, 0.04)',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
-            }}
-          >
-            <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
-              Applied Rule: <strong style={{ color: 'var(--gold)' }}>{activeRule.label}</strong>
-              <br />
-              {activeRule.description}
-            </span>
-          </div>
-        </div>
-
-        {/* Right Column: Rule Selection & Far-Figure Prediction */}
-        <div className="station-card-panel">
-          <div className="panel-title">
-            <span>📐</span> Rule Selection &amp; Spatial Prediction
-          </div>
-
-          {/* Step 1: Select Transformation Rule */}
-          <div className="controls-group">
-            <span className="control-label">1. Select Geometric Rule:</span>
-            {RULES.map((r) => (
+          {/* Prediction */}
+          <div className="panel-title"><span>🎯</span> Predict Figure 6:</div>
+          <div className="prediction-grid">
+            {candidateOptions.map(opt => (
               <button
-                key={r.id}
-                className={`tile-chip ${selectedRuleId === r.id ? 'active' : ''}`}
-                style={{ width: '100%', justifyContent: 'flex-start', padding: '8px 12px' }}
-                onClick={() => handleRuleChange(r.id)}
+                key={opt}
+                className={`prediction-btn ${predictedFig6 === opt ? (isPredictionCorrect ? 'correct' : 'wrong') : ''}`}
+                onClick={() => handleSelectPrediction(opt)}
+                disabled={isPredictionCorrect}
               >
-                <span>{r.id.startsWith('rot') ? '🌀' : '🪞'}</span>
-                <span style={{ fontSize: '0.82rem', fontWeight: 700 }}>{r.label}</span>
+                {opt}
               </button>
             ))}
           </div>
 
-          {/* Step 2: Far Figure 6 Challenge */}
-          <div style={{ marginTop: '6px' }}>
-            <span className="control-label" style={{ display: 'block', marginBottom: '6px' }}>
-              2. Far-Figure Challenge: What will <strong>Figure 6</strong> look like?
-            </span>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '6px' }}>
-              {candidateOptions.map((opt, i) => (
+          {/* Rule Description */}
+          <div className="hint-card">
+            📖 Rule: {activeRule.description}
+          </div>
+        </div>
+
+        {/* Right: Controls */}
+        <div className="station-card-panel">
+          <div className="panel-title"><span>🎨</span> Design Settings</div>
+
+          {/* Motif Selector */}
+          <div className="controls-group">
+            <span className="control-label">Base Motif:</span>
+            <div className="tile-chips-row">
+              {MOTIF_CATALOG.slice(0, 5).map((m, idx) => (
                 <button
-                  key={i}
-                  className={`btn btn-sm ${predictedFig6 === opt ? (isPredictionCorrect ? 'btn-green' : 'btn-outline') : 'btn-outline'}`}
-                  style={{
-                    fontSize: '0.8rem',
-                    padding: '8px 10px',
-                    justifyContent: 'flex-start',
-                    textAlign: 'left',
-                    whiteSpace: 'normal',
-                  }}
-                  onClick={() => handleSelectPrediction(opt)}
+                  key={m.id}
+                  className={`tile-chip ${selectedMotifIdx === idx ? 'active' : ''}`}
+                  onClick={() => { sounds.click(); setSelectedMotifIdx(idx); setPredictedFig6(null); setIsPredictionCorrect(false); }}
                 >
-                  <span style={{ fontWeight: 800 }}>{String.fromCharCode(65 + i)}:</span>
-                  <span>{opt}</span>
+                  {m.name.split(' ')[0]}
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Completion Gate */}
+          {/* Rule Selector */}
+          <div className="controls-group">
+            <span className="control-label">Transformation Rule:</span>
+            {RULES.map(r => (
+              <button
+                key={r.id}
+                className={`control-toggle-btn ${selectedRuleId === r.id ? 'active' : ''}`}
+                style={{ textAlign: 'left', padding: '8px 12px', width: '100%' }}
+                onClick={() => handleRuleChange(r.id)}
+              >
+                {r.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Success */}
           {isPredictionCorrect && (
-            <div className="station-success-panel anim-slide-up" style={{ padding: '10px' }}>
-              <span style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--green-light)' }}>
-                🎉 Panel Rule &amp; Prediction Verified!
-              </span>
+            <div className="station-success-panel anim-bounce-in">
+              <span className="success-text">🎉 Figure 6 Predicted Correctly!</span>
               <button className="btn btn-green btn-sm" onClick={onComplete}>
                 Complete Station 3 ✓
               </button>
