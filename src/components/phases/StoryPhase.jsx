@@ -88,20 +88,6 @@ function StoryImage({ panel }) {
     </div>
   );
 }
-          style={{
-            fontFamily: 'var(--font-body)',
-            fontSize: '0.85rem',
-            fontWeight: 700,
-            color: 'rgba(255, 255, 255, 0.85)',
-            maxWidth: '280px',
-          }}
-        >
-          {panel.highlight}
-        </span>
-      </div>
-    </div>
-  );
-}
 
 export default function StoryPhase({ state, dispatch }) {
   const panel = STORY_PANELS[state?.storyPanel || 0] || STORY_PANELS[0];
