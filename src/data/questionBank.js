@@ -71,11 +71,11 @@ export function generateQuestionBank() {
 
           const rawOptions = [correctMotif.name, distractor1.name, distractor2.name, distractor3.name];
           const uniqueOptions = [...new Set(rawOptions)];
-          while (uniqueOptions.length < 4) {
-            const fallback = MOTIF_CATALOG.find((m) => !uniqueOptions.includes(m.name));
-            uniqueOptions.push(fallback ? fallback.name : `Tile Variant ${uniqueOptions.length}`);
+          for (const m of MOTIF_CATALOG) {
+            if (uniqueOptions.length >= 4) break;
+            if (!uniqueOptions.includes(m.name)) uniqueOptions.push(m.name);
           }
-          const options = shuffleArray(uniqueOptions, globalId);
+          const options = shuffleArray(uniqueOptions.slice(0, 4), globalId);
 
           questionObj = {
             id: globalId,
@@ -169,11 +169,13 @@ export function generateQuestionBank() {
           const distractor2 = String(targetCount - (kind === 'border-square' ? 2 : 2));
           const distractor3 = String(targetCount + 4);
 
-          const options = shuffleArray(
-            [...new Set([String(targetCount), distractor1, distractor2, distractor3])],
-            globalId
-          );
-          while (options.length < 4) options.push(String(targetCount + options.length * 2));
+          const optSet = new Set([String(targetCount), distractor1, distractor2, distractor3]);
+          let delta = 1;
+          while (optSet.size < 4) {
+            optSet.add(String(targetCount + delta));
+            delta++;
+          }
+          const options = shuffleArray([...optSet], globalId);
 
           questionObj = {
             id: globalId,
@@ -290,12 +292,13 @@ export function generateQuestionBank() {
           const oppositeAngle = (totalAngle + 180) % 360;
           const distractor3 = getRotationOrientationName(oppositeAngle);
 
-          const uniqueOpts = [...new Set([correctOrient, distractor1, distractor2, distractor3])];
-          while (uniqueOpts.length < 4) {
-            const extra = getRotationOrientationName(uniqueOpts.length * 90);
-            if (!uniqueOpts.includes(extra)) uniqueOpts.push(extra);
-          }
-          const options = shuffleArray(uniqueOpts, globalId);
+          const allCardinals = [
+            'Pointing Up (North)',
+            'Pointing Right (East)',
+            'Pointing Down (South)',
+            'Pointing Left (West)',
+          ];
+          const options = shuffleArray(allCardinals, globalId);
 
           const rotDesc = angle === 90 ? 'a quarter-turn (90°)' : angle === 180 ? 'a half-turn (180°)' : 'a three-quarter turn (270°)';
 
